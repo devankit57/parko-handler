@@ -14,24 +14,18 @@ export default async function handler(req, res) {
       const database = client.db('parko-data');
       const invoicesCollection = database.collection('invoices');
 
+      // Fetch the invoice based on passCode
       const invoice = await invoicesCollection.findOne({ _id: new ObjectId(passCode) });
 
       if (!invoice) {
         return res.status(404).json({ message: 'No matching invoice found' });
       }
 
-      if (invoice.parkingDetails?.entrystatus === 'Done') {
-        return res.status(400).json({ message: 'QR Invalid: Already Scanned' });
-      }
-
-      const updatedInvoice = await invoicesCollection.updateOne(
-        { _id: new ObjectId(passCode) },
-        { $set: { 'parkingDetails.entrystatus': 'Done' } }
-      );
-
+      // You can add more logic here if necessary, depending on what information you need to check
+      // In this case, we just return the fetched invoice details
       return res.status(200).json({
-        message: 'QR Valid: Exit Granted',
-        invoice: updatedInvoice,
+        message: 'Invoice found successfully',
+        invoice,
       });
     } catch (error) {
       console.error('Error:', error);
